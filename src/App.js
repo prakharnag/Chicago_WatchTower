@@ -1,6 +1,4 @@
-
 import './App.css';
-
 import SignIn from './components/signIn';
 import firebaseConfig from './Authentication/firebase';
 import { initializeApp } from "firebase/app";
