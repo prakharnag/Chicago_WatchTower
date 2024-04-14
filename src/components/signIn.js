@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithPopup, GoogleAuthProvider , signInWithEmailAndPassword, signInWithGoogle } from "firebase/auth";
-import '../styles/signIn.css';
+import '../styles/SignIn.css';
 
 function SignIn() {
   const [username, setUsername] = useState('');
