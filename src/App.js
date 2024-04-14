@@ -1,6 +1,6 @@
 import './App.css';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import SignIn from './components/signIn';
+import SignIn from './components/SignIn';
 import firebaseConfig from './Authentication/firebase';
 import { initializeApp } from "firebase/app";
 
