@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider , signInWithEmailAndPassword, signInWithGoogle } from "firebase/auth";
 import '../styles/signIn.css';
 
 function SignIn() {
@@ -13,62 +13,35 @@ function SignIn() {
   const [passwordError, setPasswordError] = useState(false);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
   const navigate = useNavigate();
+  const auth = getAuth();
 
   const handleSignIn = async () => {
-    console.log('I am Clicked');
-      // setUsernameError(false);
-      // setPasswordError(false);
-      // setError('');
+    setUsernameError(false);
+    setPasswordError(false);
+    setError('');
+    console.log(username);
+    console.log(password);
+    if (username.trim() === '') {
+      setUsernameError(true);
+      return;
+    }
 
-      // if (username.trim() === '') {
-      //     setUsernameError(true);
-      //     return;
-      // }
+    if (password.trim() === '') {
+      setPasswordError(true);
+      return;
+    }
 
-      // if (password.trim() === '') {
-      //     setPasswordError(true);
-      //     return;
-      // }
-
-      // try {
-      //     // Fetch user data from Elasticsearch based on the provided username (email)
-      //     const response = await fetch(`http://localhost:9200/users/_search?q=email:${username}&size=1`);
-      //     if (!response.ok) {
-      //         throw new Error('Failed to authenticate');
-      //     }
-
-      //     const userData = await response.json();
-      //     console.log(userData); // Check the userData object in the console
-
-      //     // Ensure that userData.hits.hits[0]._source.email is not undefined
-      //     const userEmail = userData.hits.hits[0]._source.email;
-
-      //     // Check if the user is active
-      //     const isActive = userData.hits.hits[0]._source.active;
-
-      //     if (isActive) {
-      //         if (userEmail === username && userData.hits.hits[0]._source.password === password) {
-      //             setShowSuccessBanner(true);
-      //             setTimeout(() => {
-      //                 const { username, role, firstName, lastName } = userData.hits.hits[0]._source;
-      //                 setShowSuccessBanner(false);
-      //                 // Store user data in local storage
-      //                 localStorage.setItem('username', userEmail);
-      //                 localStorage.setItem('user', `${firstName} ${lastName}`);
-      //                 localStorage.setItem('signin', true);
-      //                 localStorage.setItem('role', role);
-      //                 window.location.href = "/";
-      //             }, 1000);
-      //         } else {
-      //             setError('Invalid username or password');
-      //         }
-      //     } else {
-      //         setError('User is inactive. Please contact the administrator.');
-      //     }
-      // } catch (error) {
-      //     console.error('Error authenticating user:', error);
-      //     setError('Failed to authenticate. Please try again later.');
-      // }
+    try {
+      const response = await signInWithEmailAndPassword(auth, username, password);
+      setShowSuccessBanner(true);
+      setTimeout(() => {
+        setShowSuccessBanner(false);
+        navigate('/dashboard');
+      }, 1000);
+    } catch (error) {
+      console.error('Error authenticating user:', error);
+      setError('Username or password is incorrect.');
+    }
   };
 
   const handleGoogleSignIn = async () => {
@@ -81,7 +54,7 @@ function SignIn() {
       const token = credential.accessToken;
 
       const user = result.user;
-      window.location.href = "/";
+      window.location.href = "/dashboard";
 
     } catch (error) {
       setShowSuccessBanner(true);
