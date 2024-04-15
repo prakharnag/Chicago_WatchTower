@@ -24,7 +24,7 @@ function Tourist() {
   return (
     <div className="dashboard">
       <div className="left-section">
-        <h1 className="dashboard-title">Search for Places</h1>
+      <h1 style={{ fontFamily: 'Raleway', color: 'black' }} className="dashboard-title">Search for Places</h1>
         <form onSubmit={handleSearchSubmit} className="search-form">
           <div className="search-container">
             <TextField

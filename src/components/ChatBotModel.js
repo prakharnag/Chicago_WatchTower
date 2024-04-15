@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Button, Modal, Box, Typography, TextField } from '@mui/material';
 import axios from 'axios'; // Import axios for making HTTP requests
 import OpenAI from "openai";
+import firebase from 'firebase/app';
+import { db } from '../Authentication/firebase';
+import { onValue, ref, get } from "firebase/database";
 
 const openai = new OpenAI({
     apiKey: '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',
@@ -137,6 +140,7 @@ const ChatBotModel = () => {
     };
 
     const handleModalSubmit = async () => {
+        recommendations.placesrecommended = [null];
         const location = await getLocation();
         const recommendationsData = await fetchRecommendations(location, userSearchResponse);
         setRecommendations(recommendationsData);
@@ -203,20 +207,41 @@ const ChatBotModel = () => {
         }
     };
 
-    const addMarkersToMap = (newMap, recommendations) => {
+    const fetchData = async () => {
+        const queryRef = ref(db, "watchTower");
+        try {
+            const snapshot = await get(queryRef);
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const projectsArray = Object.values(data);
+                return projectsArray;
+            } else {
+                console.log("No data available");
+                return [];
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            return [];
+        }
+    };
+    
+    const addMarkersToMap = async (newMap, recommendations) => {
         const icons = {
             placesrecommended: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
         };
-
+    
+        // Fetch Firebase data
+        const projectsArray = await fetchData();
+    
         // Keep track of existing marker positions to adjust for overlaps
         const existingPositions = new Map();
-
+    
         const adjustForOverlap = (position) => {
             const key = `${position.lat.toFixed(4)}_${position.lng.toFixed(4)}`;
             const offsetDegree = 0.0001; // Adjust this value as needed
             let adjustedPosition = { ...position };
             let count = existingPositions.get(key) || 0;
-
+    
             while (count > 0) {
                 // Adjust position slightly
                 adjustedPosition.lat += offsetDegree * count;
@@ -225,50 +250,54 @@ const ChatBotModel = () => {
                 if (!existingPositions.has(newKey)) break;
                 count++;
             }
-
+    
             existingPositions.set(key, count + 1);
             return adjustedPosition;
         };
-
+    
         const addMarker = (item, category) => {
             let position = item.gpsCoordinates.lat ?
                 { lat: item.gpsCoordinates.lat, lng: item.gpsCoordinates.lng } :
                 { lat: item.gpsCoordinates.latitude, lng: item.gpsCoordinates.longitude };
-
+    
             position = adjustForOverlap(position);
-
-            console.log(`Adding ${category} marker at: `, position);
-
+    
             if (!position.lat || !position.lng) {
                 console.error(`Invalid GPS coordinates for ${category}:`, item);
                 return;
             }
-
-            const marker = new window.google.maps.Marker({
-                position,
-                map: newMap,
-                icon: icons[category],
-                title: item.title,
-            });
-
-            const infowindow = new window.google.maps.InfoWindow({
-                content: `<div><strong>${item.title}</strong><br>${item.eventAddress || item.address || ''}</div>`,
-            });
-
-            marker.addListener('click', () => {
-                infowindow.open({
-                    anchor: marker,
+    
+            // Check if the position exists in Firebase dataset
+            const positionKey = `${position.lat}_${position.lng}`;
+            console.log(projectsArray);
+            console.log('Arpit: ', positionKey in projectsArray);
+            if (!projectsArray || !(positionKey in projectsArray)) {
+                const marker = new window.google.maps.Marker({
+                    position,
                     map: newMap,
-                    shouldFocus: false,
+                    icon: icons[category],
+                    title: item.title,
                 });
-            });
+    
+                const infowindow = new window.google.maps.InfoWindow({
+                    content: `<div><strong>${item.title}</strong><br>${item.eventAddress || item.address || ''}</div>`,
+                });
+    
+                marker.addListener('click', () => {
+                    infowindow.open({
+                        anchor: marker,
+                        map: newMap,
+                        shouldFocus: false,
+                    });
+                });
+            }
         };
-
+    
         // Add markers for all categories
         if (recommendations.placesrecommended) {
             recommendations.placesrecommended.forEach(item => addMarker(item, 'placesrecommended'));
         }
-    };
+    };        
 
     return (
         <Modal open={open}>
