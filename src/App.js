@@ -4,7 +4,7 @@ import SignIn from './components/SignIn';
 import firebaseConfig from './Authentication/firebase';
 import { initializeApp } from "firebase/app";
 import Tourist from './components/Tourist';
-import Dashboard from './components/dashboard';
+import ShowMap from './components/Dashboard';
 
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<SignIn />} />
           <Route path="/tourist" element={<Tourist />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<ShowMap />} />
         </Routes>
       </Router>
     </div>
