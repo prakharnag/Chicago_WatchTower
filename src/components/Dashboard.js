@@ -76,14 +76,34 @@ export default function ShowMap() {
 
   return (
     <div>
-      <div>
-        <select value={crimeType} onChange={handleCrimeTypeChange}>
+      <div style={{ marginBottom: "10px" }}>
+        <select
+          value={crimeType}
+          onChange={handleCrimeTypeChange}
+          style={{
+            padding: "8px",
+            borderRadius: "5px",
+            marginRight: "10px",
+            border: "1px solid #ccc"
+          }}
+        >
           <option value="">Select Crime Type</option>
           {uniqueCrimeTypes.map((type, index) => (
             <option key={index} value={type}>{type}</option>
           ))}
         </select>
-        <Button variant="contained" onClick={fetchData}>
+        <Button
+          variant="contained"
+          onClick={fetchData}
+          style={{
+            padding: "10px 20px",
+            borderRadius: "5px",
+            backgroundColor: "#3f51b5",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
           Show Map
         </Button>
       </div>
