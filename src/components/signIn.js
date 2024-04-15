@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithPopup, GoogleAuthProvider , signInWithEmailAndPassword, signInWithGoogle } from "firebase/auth";
-import '../styles/signIn.css';
+import '../styles/SignIn.css';
 
 function SignIn() {
   const [username, setUsername] = useState('');
@@ -36,7 +36,7 @@ function SignIn() {
       setShowSuccessBanner(true);
       setTimeout(() => {
         setShowSuccessBanner(false);
-        navigate('/dashboard');
+        window.location.href = "/dashboard";
       }, 1000);
     } catch (error) {
       console.error('Error authenticating user:', error);
@@ -54,7 +54,7 @@ function SignIn() {
       const token = credential.accessToken;
 
       const user = result.user;
-      window.location.href = "/dashboard";
+      window.location.href = "/tourist";
 
     } catch (error) {
       setShowSuccessBanner(true);
@@ -76,7 +76,8 @@ function SignIn() {
           <div className="success-banner">SignIn successful. Redirecting...</div>
         )}
         <div className="signin-card">
-          <h2 className="signin-heading">Sign In</h2>
+          <h1 className="signin-heading">Chicago Watchtower</h1>
+          <h3 className="signin-heading">Sign In</h3>
           {error && <div className="error-message">{error}</div>}
           <br />
           <form>
